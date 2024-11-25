@@ -50,7 +50,10 @@ plot(rainfall_data) # <1>
 
 ### Discussion
 
-*Insert discussion here*
+Are the available data sufficient for meaningful risk assessments?
+The data provide lots of information over a long period of time: from around 1975 to 2023. This is enough information to assess risk in the future, but the current graph provided is not the only graph we will need. It is hard to read the specific data about different times of the year. It's almost impossible to tell exactly how long (yearwise) the gaps are. If there were more marks signifying each year, that would be helpful. We are also missing several data points from several years, namely from around 1981, 1997, and 2010-2011. We also don't have additional data we need about droughts, particularly rainy seasons, floods, and other natural disasters. 
+According to my research, there were droughts in 2015 and from 1990-1993. In the graph, I don't really see this data very strongly. The peaks of rainfall are definitely lower during these years, but there are similarly low peaks during other years that I didn't find in my research as being drought years. 
+Having missing data can greatly affect how well we analyze rainfall and drought data because they can contradict each other and they can make it harder to plan for the future if we are doing research based on inaccurate data. Having missing data can also make the researcher think they are looking at a drought, when in reality it's just missing data. 
 
 ## Understanding the Theoretical Model
 
