@@ -1,6 +1,6 @@
 ---
 title: "CEVE 101: Project 03"
-author: "Helena Kotschoubey (hk67)" # CHANGE THIS
+author: "Your Name (your netid)" # CHANGE THIS
 date: "2024-10-23"
 
 # do not change anything below this line
@@ -11,33 +11,46 @@ format:
     docx: default
 ---
 
+We begin by loading the required packages.
+
 ```{julia}
 using Revise                      # <1>
 using RainwaterHarvesting         # <2>
 ```
 
+1. `Revise` allows us to update code without restarting Julia.
+2. We load the `RainwaterHarvesting` package that contains our simulation tools.
+
 ### Setting the file path
 
+Next, we specify the path to the rainfall data file and read it in.
+
 ```{julia}
-filepath = "data/274.txt" # <1>   
+filepath = "data/1.txt" # <1>   
 rainfall_data = RainfallData(filepath) # <2>
 ```
 
+1. This is the path to the rainfall data file for the station of interest.
+2. This creates a `RainfallData` object containing the rainfall data for the specified station.
 
 If we dig under the hood a bit, we can see that there are two main pieces of information:
 
+- `station_info`: a dictionary containing information about the station, such as its name and location.
+- `annual_data`: a dictionary mapping years to `AnnualRainfallData` objects, each containing the date and precipitation data for a given year.
 
 ### Plotting the Data
 
+We can plot the data for one or all of the years to verify that it looks correct.
 
 ```{julia}
 plot(rainfall_data) # <1>
 ```
 
+1. This `plot` function is defined in [viz.jl](./RainwaterHarvesting/src/viz.jl) and is a thin wrapper around the Plots.jl package.
 
 ### Discussion
 
-This data is not completely sufficient to run an accurate or meaninful risk assessment. There is no data covering rainfall from 2005 to 2007, so there is not enough data to accurate measure rainfall over the 8 year period shown.
+*Insert discussion here*
 
 ## Understanding the Theoretical Model
 
@@ -85,20 +98,20 @@ First, the household begins using water from the tank after the 150th day of the
 This is based on the idea that the rainy season lasts for about the first 150 days of the year, and so they may have other sources of water before then.
 The second assumption is that each household consumes 74.1 liters per day during the dry season.
 How does this compare to your household's water usage?
-The average household usage of water per day is around 1,200 liters. This is clearly a much larger amount than is expected from families in this study, and I think it is a high expectation for my family, as we do not have a yard that needs watering. However, we do have 4 people who shower, eat, and use the restroom every day, so we definitely use more water than 74.1 liters a day.
 
 ## Model Implementation and Testing
 
 ### Defining the Model Parameters
 
-
+We can define the model parameters with sensible default values.
+You will have the opportunity to change these values later.
 
 ```{julia}
 #| output: false
 param = ModelParameters(          # <1>
-    runoff_coefficient=0.95,      # <2>
-    roof_area_m2=30.0,            # <3>
-    first_flush_mm=3.0,           # <4>
+    runoff_coefficient=0.85,      # <2>
+    roof_area_m2=45.0,            # <3>
+    first_flush_mm=2.0,           # <4>
     tank_capacity_L=16000.0       # <5>
 )
 ```
@@ -108,8 +121,6 @@ param = ModelParameters(          # <1>
 3. The roof area ($A$) is the area of the roof that the rain falls on.
 4. The first flush volume ($V_f$) is the volume of rain that is discarded because it is dirty.
 5. The tank capacity ($V_\text{max}$) is the maximum volume of the tank.
-
-I chose a roof of 30 square meters to see what would happen if the family had a smaller house. However, because there is less surface area to collect rain from, I increased the runoff coefficent to 0.95, because I thought it would be more accurate to the situation. I also increased the first flush to 3 mm to account for particularly dirty or dusty conditions. 
 
 ### Running the Simulation for One Year
 
@@ -135,10 +146,10 @@ plot(p2, p1, layout=(2, 1), size=(1000, 700), link=:x)
 Observe how the tank's water level responds to rainfall events.
 Note any periods when the tank runs dry or overflows.
 
-The tank definitely becomes full around late April and could overflow. This means that there is a certain amount of rainwater that will never get collected. At the end of the year, the tank gets very close to empty as there has been no rainfall since June or July. However, the tank never runs dry.
-
 ### Reliability Analysis
 
+We can run simulations for all years, one at a time, and then check how many times the tank runs dry.
+You can run simulations for all years at once with the following code:
 
 ```{julia}
 all_years = sort(collect(keys(rainfall_data.annual_data)))          # <1>
