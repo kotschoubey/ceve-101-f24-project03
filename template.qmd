@@ -67,10 +67,10 @@ The biggest limiting assumption is that each house only uses 74.1 liters of wate
 The consumption, C_t, which is based on the assumption that families use either 0 or 74.1 liters of water a day, can be adjusted. Here, we could change the equation to model consumption based on the number of people in the house. According to the National Water and Sanitation Agency in Brazil, rural Brazilians on average use 70-120 liters of water per person per day. Based on this assumption, consumption could be changed to be modeled as C_t = 95x, day of year > 150, x = number of people in house. This takes 95, the average between 70 and 120, but keeps the days of the year when water is needed at 151-365. This also accounts for the assumption that multiple people live in the house. To adjust the days when water is needed, we could take a conservative approach and add a week onto each end, assuming that the dry season could last a week longer either at the beginning or the end. The equation would then look more like:
 $$
 C_t = \begin{cases}
-    95x & \quad \ 7 > text{day of year} > 143 \\
-    0 & \quad \ 7 \leq text{day of year} \leq 143 \\
+    95x & \quad \ 7 > \text{day of year} > 143 \\
+    0 & \quad \ 7 \leq \text{day of year} \leq 143 \\
 \end{cases}
-    x = text{number of people living in house}
+   x = \text{number of people living in house}
 $$
 
 ## Model Implementation and Testing
