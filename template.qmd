@@ -51,56 +51,27 @@ plot(rainfall_data) # <1>
 ### Discussion
 
 Are the available data sufficient for meaningful risk assessments?
-The data provide lots of information over a long period of time: from around 1975 to 2023. This is enough information to assess risk in the future, but the current graph provided is not the only graph we will need. It is hard to read the specific data about different times of the year. It's almost impossible to tell exactly how long (yearwise) the gaps are. If there were more marks signifying each year, that would be helpful. We are also missing several data points from several years, namely from around 1981, 1997, and 2010-2011. We also don't have additional data we need about droughts, particularly rainy seasons, floods, and other natural disasters. 
+The data provide lots of information over a long period of time: from around 1973 to 2024. This is enough information to assess risk in the future, but the current graph provided is not the only graph we will need. It is hard to read the specific data about different times of the year. It's almost impossible to tell exactly how long (yearwise) the gaps are. If there were more marks signifying each year, that would be helpful. We also don't have additional data we need about droughts, particularly rainy seasons, floods, and other natural disasters. 
+Research on major droughts in Ceara, Brazil, and discussion:
+Source: https://ponce.sdsu.edu/legacy_tales_the_workers_channel_revisited.html
+Source: https://www.riotimesonline.com/brazil-faces-its-most-severe-drought-in-recent-history/
 According to my research, there were droughts in 2015 and from 1990-1993. In the graph, I don't really see this data very strongly. The peaks of rainfall are definitely lower during these years, but there are similarly low peaks during other years that I didn't find in my research as being drought years. 
-Having missing data can greatly affect how well we analyze rainfall and drought data because they can contradict each other and they can make it harder to plan for the future if we are doing research based on inaccurate data. Having missing data can also make the researcher think they are looking at a drought, when in reality it's just missing data. For my analysis, the years of missing data do not line up with the years of droughts that I found in my data. Without addition data or research, I would have assumed that there were droughts in 1991 and 2010-2011. 
+Having missing data can greatly affect how well we analyze rainfall and drought data because they can contradict each other and they can make it harder to plan for the future if we are doing research based on inaccurate data. Having missing data can also make the researcher think they are looking at a drought, when in reality it's just missing data. For my analysis, I don't have any missing data, so it's difficult to see how droughts would line up with or affect potential spots of missing data. Without addition data or research, I would have assumed that there were droughts in 1991 and 2010-2011, where the data is more sparse. 
 
 ## Understanding the Theoretical Model
 
-Let's explore the model that simulates the rainwater harvesting system.
+### Discuss limiting assumptions and approximations in the model.
+The biggest limiting assumption is that each house only uses 74.1 liters of water a day. Compared to my family's water usage, this is a very small amount of water. Especially for a large, 5-8 person family. This assumption can skew data as it can be an inaccurate representation of water usage and can lead to a project that doesn't truly benefit the families. Another limiting assumption is that families only use water from the tank starting at the 151st day of the year. This assumption is based on the estimate that the rainy season lasts on average 150 days. This approximation, while probably accurate, doesn't take into account that the rainy season may be significantly shorter than this during some years, significantly longer, or may start and end a week earlier or later some years. 
 
-### Mass Balance Equation
-
-The mass balance model for the rainwater tank is given by:
-
-$$
-V_{t+1} = V_t + Q_t - C_t | 0 \leq V_t \leq V_\text{max}
-$$
-
-- $V_t$: the volume of water in the tank at time $t$
-- $Q_t$ is the volume of water added to the tank at time $t$
-- $C_t$ is the volume of water consumed at time $t$
-- $V_\text{max}$: the maximum volume of the tank
-
-### Inflow ($Q_t$)
-
-Inflow is calculated as
-
-$$
-Q_t = \eta \times A \times \max(P_t - F, 0).
-$$
-
-- $\eta$: the runoff coefficient, which accounts for losses due to evaporation, spilling, etc.
-- $A$: the area of the roof (we will use square meters)
-- $P_t$: the precipitation at time $t$ (we will use millimeters per day)
-- $F$: the first flush volume (we will use millimeters). The first flush volume is often discarded, so that each time it rains the first bit of water (which is usually dirty) is not used (see [here](https://rainwaterharvesting.tamu.edu/pre-storage-treatment/) for more details).
-
-### Consumption
-
-Consumption is modeled as:
-
+### Discuss how you might modify the model to relax these assumptions. Provide mathematical equations.
+The consumption, C_t, which is based on the assumption that families use either 0 or 74.1 liters of water a day, can be adjusted. Here, we could change the equation to model consumption based on the number of people in the house. According to the National Water and Sanitation Agency in Brazil, rural Brazilians on average use 70-120 liters of water per person per day. Based on this assumption, consumption could be changed to be modeled as C_t = 95x, day of year > 150, x = number of people in house. This takes 95, the average between 70 and 120, but keeps the days of the year when water is needed at 151-365. This also accounts for the assumption that multiple people live in the house. To adjust the days when water is needed, we could take a conservative approach and add a week onto each end, assuming that the dry season could last a week longer either at the beginning or the end. The equation would then look more like:
 $$
 C_t = \begin{cases}
-    74.1 & \quad \text{day of year} > 150 \\
-    0 & \quad \text{day of year} \leq 150
+    95x & \quad \ 7 > text{day of year} > 143 \\
+    0 & \quad \ 7 \leq text{day of year} \leq 143 \\
 \end{cases}
+    x = text{number of people living in house}
 $$
-
-This makes two major assumptiuons.
-First, the household begins using water from the tank after the 150th day of the year.
-This is based on the idea that the rainy season lasts for about the first 150 days of the year, and so they may have other sources of water before then.
-The second assumption is that each household consumes 74.1 liters per day during the dry season.
-How does this compare to your household's water usage?
 
 ## Model Implementation and Testing
 
