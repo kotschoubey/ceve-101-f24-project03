@@ -30,14 +30,6 @@ filepath = "data/3.txt" # <1>
 rainfall_data = RainfallData(filepath) # <2>
 ```
 
-1. This is the path to the rainfall data file for the station of interest.
-2. This creates a `RainfallData` object containing the rainfall data for the specified station.
-
-If we dig under the hood a bit, we can see that there are two main pieces of information:
-
-- `station_info`: a dictionary containing information about the station, such as its name and location.
-- `annual_data`: a dictionary mapping years to `AnnualRainfallData` objects, each containing the date and precipitation data for a given year.
-
 ### Plotting the Data
 
 We can plot the data for one or all of the years to verify that it looks correct.
@@ -46,16 +38,13 @@ We can plot the data for one or all of the years to verify that it looks correct
 plot(rainfall_data) # <1>
 ```
 
-1. This `plot` function is defined in [viz.jl](./RainwaterHarvesting/src/viz.jl) and is a thin wrapper around the Plots.jl package.
-
 ### Discussion
-
-Are the available data sufficient for meaningful risk assessments?
-The data provide lots of information over a long period of time: from around 1973 to 2024. This is enough information to assess risk in the future, but the current graph provided is not the only graph we will need. It is hard to read the specific data about different times of the year. It's almost impossible to tell exactly how long (yearwise) the gaps are. If there were more marks signifying each year, that would be helpful. We also don't have additional data we need about droughts, particularly rainy seasons, floods, and other natural disasters. 
-Research on major droughts in Ceara, Brazil, and discussion:
-Source: https://ponce.sdsu.edu/legacy_tales_the_workers_channel_revisited.html
-Source: https://www.riotimesonline.com/brazil-faces-its-most-severe-drought-in-recent-history/
-According to my research, there were droughts in 2015 and from 1990-1993. In the graph, I don't really see this data very strongly. The peaks of rainfall are definitely lower during these years, but there are similarly low peaks during other years that I didn't find in my research as being drought years. 
+Are the available data sufficient for meaningful risk assessments? \\
+The data provide lots of information over a long period of time: from around 1973 to 2024. This is enough information to assess risk in the future, but the current graph provided is not the only graph we will need. It is hard to read the specific data about different times of the year. It's almost impossible to tell exactly how long (yearwise) the gaps are. If there were more marks signifying each year, that would be helpful. We also don't have additional data we need about droughts, particularly rainy seasons, floods, and other natural disasters. \\
+Research on major droughts in Ceara, Brazil, and discussion: \\
+Source: https://ponce.sdsu.edu/legacy_tales_the_workers_channel_revisited.html \\
+Source: https://www.riotimesonline.com/brazil-faces-its-most-severe-drought-in-recent-history/ \\
+According to my research, there were droughts in 2015 and from 1990-1993. In the graph, I don't really see this data very strongly. The peaks of rainfall are definitely lower during these years, but there are similarly low peaks during other years that I didn't find in my research as being drought years. \\
 Having missing data can greatly affect how well we analyze rainfall and drought data because they can contradict each other and they can make it harder to plan for the future if we are doing research based on inaccurate data. Having missing data can also make the researcher think they are looking at a drought, when in reality it's just missing data. For my analysis, I don't have any missing data, so it's difficult to see how droughts would line up with or affect potential spots of missing data. Without addition data or research, I would have assumed that there were droughts in 1991 and 2010-2011, where the data is more sparse. 
 
 ## Understanding the Theoretical Model
@@ -70,30 +59,31 @@ C_t = \begin{cases}
     95x & \quad \ 7 > \text{day of year} > 143 \\
     0 & \quad \ 7 \leq \text{day of year} \leq 143 \\
 \end{cases}
-   x = \text{number of people living in house}
 $$
+
+It is important to note here that x is equal to the number of people living in the house. I couldn't figure out how to code that sentence into the equation. This new equation provides a much more relaxed assumptions for the water tank and the water consumption of the family. 
 
 ## Model Implementation and Testing
 
 ### Defining the Model Parameters
-
-We can define the model parameters with sensible default values.
-You will have the opportunity to change these values later.
 
 ```{julia}
 #| output: false
 param = ModelParameters(          # <1>
     runoff_coefficient=0.95,      # <2>
     roof_area_m2=50.0,            # <3>
-    first_flush_mm=2.0,           # <4>
+    first_flush_mm=3.0,           # <4>
     tank_capacity_L=16000.0       # <5>
 )
 ```
 
 1. This creates a `ModelParameters` object with the specified parameters.
 2. The runoff coefficient ($\eta$) is a measure of how much of the rain that falls on the roof ends up in the tank.
+    I chose to modify the runoff coefficient from 0.85 to 0.95. I felt that a coefficient of 0.85 was low, and I worked under the assumption that the family could make small adjustments, like runoff rails, to ensure that most water runs into the tank. This would increase the amount of water in the tank, because the runoff coefficient is increasing. 
 3. The roof area ($A$) is the area of the roof that the rain falls on.
+    I increased the roof area to 50 meters squared. I also did this with the assumption that a family might make adjustments to the size of their house, especially if they have many children, to make it larger, consequently and likely increasing roof area. This would also increase the amount of water in the tank, because a larger roof area collects more water. 
 4. The first flush volume ($V_f$) is the volume of rain that is discarded because it is dirty.
+    I increased this to 3 mm, taking into consideration that after long periods with no rain, lots of dust will have gathered on the roof of the house, and even larger particles. Leaves and small sticks may need more water to wash them off, so I increased the first flush volume, slightly decreasing the volume of water going into the tank. 
 5. The tank capacity ($V_\text{max}$) is the maximum volume of the tank.
 
 ### Running the Simulation for One Year
@@ -117,9 +107,6 @@ p2 = plot(rainfall_1981)
 plot(p2, p1, layout=(2, 1), size=(1000, 700), link=:x)
 ```
 
-Observe how the tank's water level responds to rainfall events.
-Note any periods when the tank runs dry or overflows.
-
 ### Reliability Analysis
 
 We can run simulations for all years, one at a time, and then check how many times the tank runs dry.
@@ -132,7 +119,19 @@ any_failures = [!isempty(result.failure_dates) for result in all_results]  # <3>
 println("Number of years with failures: ", sum(any_failures), " out of ", length(all_years))  # <4>
 ```
 
-1. We get all the years in order.
-2. We run the simulation for each year.
-3. We check if any failures occurred.
-4. We print the number of years with failures and the total number of years.
+Calculate the number of years where the system failed to meet the demand. \\
+    According to the Reliability Analysis equation, the system failed to meet demand 2 out of 49 years. \\
+Determine the system’s reliability percentage. \\
+    According to the above data, the system has a 95.9% reliability percentage. \\
+Discuss and interpret your findings. \\
+    This is a very high reliability percentage, especially over almost fifty years. Increasing the roof area and runoff coefficient helped increase the reliability percentage. However, as I was look at different parameters, with a first flush volume of 2 mm, I was able to reach a reliability pecentage of 98%. However, I settled on a first flush volume of 3 mm because most of this water would theoretically be used for drinking, and having clean drinking water is incredibly important.
+
+### Identify a Gap in the Methods
+Find one limitation in the current model (e.g., data quality, assumptions). \\
+    As discussed above, the assumption that each household uses only 74.1 liters of water per day is a very limiting assumption. \\
+Explain why it’s a limitation. \\
+    We can consider this assumption a limitation because it greatly limits the amount of water each person is allowed, especially if the people live with their families. The assumption in fact allows for 74.1 liters of water per day in general, with no regard to how many people live in the house. The consumption equation also assumes that during the rainy season, families will always be able to find water from other sources. However, at the beginning of the rainy season, the community is still reeling from a long dry season, and water may not yet be available from other sources. \\
+Suggest how to address the identified gap. \\
+    As discussed and put into an equation above, we could adjust the consumption equation, firstly increasing the daily water usage from 74.1 liters to 95 liters, which is closer to the average water usage in rural Brazil. Secondly, we could make our equation take into consideration that 95 liters applies to each person, and we can multiply that amount by the number of people living in each house. \\
+Discuss how this would enhance the analysis. (Note: You don’t need to implement the change—just propose it.) \\
+    This change would of course be more tedious, as it would require us to repeat the equation for each house, but it would be a more accurate analysis of how much water each house needs, and maybe even how many tanks. Perhaps a 3 person family can live off of just one tank, but an 8 person family with grandparents and pets may need several tanks to make it through the dry season. \\
